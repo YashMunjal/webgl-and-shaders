@@ -33,27 +33,34 @@ const sketch = ({ context }) => {
   // Setup your scene
   const scene = new THREE.Scene();
 
-  // Setup a geometry
+  // Earth
   const earthGeometry = new THREE.SphereGeometry(1, 70, 40);
-  const earthTexture = new THREE.TextureLoader().load('images/earth.jpg')
-  // Setup a material
-  const earthMaterial = new THREE.MeshBasicMaterial({
+  const earthTexture = new THREE.TextureLoader().load('images/earth.jpg');
+  const earthMaterial = new THREE.MeshStandardMaterial({
     map:earthTexture,
   });
+  const earthmesh = new THREE.Mesh(earthGeometry, earthMaterial);
+  earthmesh.scale.setScalar(1);
+  earthmesh.rotation.z=-0.4;
+
+  //Moon
+  const moonGroup= new THREE.Group();
   const moonGeometry = new THREE.SphereGeometry(1, 70, 40);
   const moonTexture = new THREE.TextureLoader().load('images/moon.jpg')
-  // Setup a material
-  const moonMaterial = new THREE.MeshBasicMaterial({
+  const moonMaterial = new THREE.MeshStandardMaterial({
     map:moonTexture,
   });
-  // Setup a mesh with geometry + material
-  const earthmesh = new THREE.Mesh(earthGeometry, earthMaterial);
-  earthmesh.scale.setScalar(1.2);
   const moonmesh = new THREE.Mesh(moonGeometry, moonMaterial);
-  moonmesh.scale.setScalar(0.4);
-  moonmesh.position.set(1.2,1.2,0)
-  scene.add(earthmesh,moonmesh);
+  moonmesh.scale.setScalar(0.25);
+  moonmesh.position.set(1.2,1.2,0);
+  moonGroup.add(moonmesh);
+  
+  scene.add(earthmesh,moonGroup);
 
+  //Create light
+  const light = new THREE.DirectionalLight('white',1.4);
+  light.position.set(5,0,4);
+  scene.add(light);
   // draw each frame
   return {
     // Handle resize events here
@@ -65,6 +72,9 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
+      earthmesh.rotation.y=time*0.4;
+      moonmesh.rotation.y=time*0.28;
+      moonGroup.rotation.y=time*(-0.8);
       controls.update();
       renderer.render(scene, camera);
     },
