@@ -5,6 +5,7 @@ global.THREE = require("three");
 require("three/examples/js/controls/OrbitControls");
 
 const canvasSketch = require("canvas-sketch");
+const glsl = require("glslify");
 
 const settings = {
   // Make the loop animated
@@ -45,15 +46,28 @@ const sketch = ({ context }) => {
   
   `;
   //fragement shader
-  const fragmentShader = /* glsl */ `
+  const fragmentShader = /* glsl */ glsl(`
+  #pragma glslify: noise = require(glsl-noise/simplex/3d)
   varying vec2 vUv;
   uniform vec3 color;
   uniform float time;
     void main() {
-      float a=0.5;
-      gl_FragColor = vec4(vec3(vUv.x),1.0);
+      vec2 center=vec2(0.5,0.5);
+      vec2 pos = mod(vUv*5.0,1.0);
+
+      float d= distance(pos,center);
+
+      //float mask=step(0.0+sin(time+vUv.x*3.0)*0.45,d);
+      
+      float offset = noise(vec3(vUv.xy,time))*0.4;
+      float mask=step(0.25+offset,d);
+
+      mask=1.0-mask;
+
+      vec3 fragColor = mix(color,vec3(1.0),mask);
+      gl_FragColor = vec4(vec3(fragColor),1.0);
     }
-  `;
+  `);
   // Setup a material
   const material = new THREE.ShaderMaterial({
     uniforms:{
