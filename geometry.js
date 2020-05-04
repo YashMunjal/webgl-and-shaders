@@ -37,8 +37,8 @@ const sketch = ({ context }) => {
   // Here are the 'base' vertices of a normalized triangle
   const baseTriangle = [
     new THREE.Vector3(-0.5, 0.5, 0),
-    new THREE.Vector3(0.5, -0.5, 0),
-    new THREE.Vector3(-0.5, -0.5, 0)
+    new THREE.Vector3(0.5, 0.5, 0),
+    new THREE.Vector3(-0.5, -0.5, 0),
   ];
 
   // A set of different colors we can choose from
@@ -46,29 +46,29 @@ const sketch = ({ context }) => {
 
   const positions = [];
   const colors = [];
-  const particles = 250;
+  const particles = 150;
 
   for (let i = 0; i < particles; i++) {
     // Clone the verts, let's do some adjustments
     let vertices = baseTriangle.map(p => p.clone());
 
     // vertices *= triangleScale
-    const triangleScale = Math.random();
+    const triangleScale = Math.random()*1.1;
     vertices = vertices.map(p => p.multiplyScalar(triangleScale));
 
     // Get a random offset within -1..1 box
     const offset = new THREE.Vector3(
-      Math.random() * 2 - 1,
-      Math.random() * 2 - 1,
-      Math.random() * 2 - 1
+      Math.random() * 3 - 1,
+      Math.random() * 3 - 1,
+      Math.random() * 3 - 1
     );
     vertices = vertices.map(p => p.add(offset));
 
     // apply a random Euler xyz rotation
     const randomRotation = new THREE.Euler(
-      (Math.random() * 2 - 1) * Math.PI * 2,
-      (Math.random() * 2 - 1) * Math.PI * 2,
-      (Math.random() * 2 - 1) * Math.PI * 2
+      (Math.random() * 3 - 1) * Math.PI * 2,
+      (Math.random() * 3 - 1) * Math.PI * 2,
+      (Math.random() * 3 - 1) * Math.PI * 2
     );
     vertices = vertices.map(p => p.applyEuler(randomRotation));
 
@@ -107,9 +107,7 @@ const sketch = ({ context }) => {
   // Create a mesh
   const mesh = new THREE.Mesh(geometry, material);
 
-  mesh.scale.setScalar(0.75);
-
-  // Add it to the scene
+  mesh.scale.setScalar(0.85);
   scene.add(mesh);
   // draw each frame
   return {
@@ -122,6 +120,8 @@ const sketch = ({ context }) => {
     },
     // Update & render your scene here
     render({ time }) {
+    mesh.rotation.x=time*0.2;
+    mesh.rotation.y=time*0.3;
       controls.update();
       renderer.render(scene, camera);
     },
